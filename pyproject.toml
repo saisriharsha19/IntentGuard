@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intentguard"
+version = "0.1.0"
+description = "Agentic AI System That Prevents Costly Digital Mistakes"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "litellm>=1.0.0",
+    "pydantic>=2.0.0",
+    "typer>=0.9.0",
+    "scikit-learn>=1.0.0",
+    "numpy>=1.20.0",
+    "rank-bm25>=0.2.2"
+]
+
+[project.scripts]
+intentguard = "intentguard.cli.main:app"
