@@ -4,10 +4,28 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "intentguard"
-version = "0.1.0"
+version = "0.1.0a0"
 description = "Agentic AI System That Prevents Costly Digital Mistakes"
 readme = "README.md"
 requires-python = ">=3.9"
+authors = [
+    { name = "Sai Sri Harsha", email = "contact@saisriharsha.com" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Topic :: Security",
+    "Topic :: System :: Systems Administration",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "fastapi>=0.100.0",
     "uvicorn>=0.23.0",
@@ -19,6 +37,11 @@ dependencies = [
     "rank-bm25>=0.2.2",
     "python-dotenv>=1.0.0"
 ]
+
+[project.urls]
+Homepage = "https://github.com/saisriharsha19/intentguard"
+Repository = "https://github.com/saisriharsha19/intentguard.git"
+"Bug Tracker" = "https://github.com/saisriharsha19/intentguard/issues"
 
 [project.scripts]
 intentguard = "intentguard.cli.main:app"
