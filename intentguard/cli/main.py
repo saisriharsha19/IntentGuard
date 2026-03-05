@@ -2,6 +2,13 @@ import typer
 from typing import List
 from rich.console import Console
 from rich.table import Table
+import os
+try:
+    from dotenv import load_dotenv
+    # Force dotenv to overwrite existing environment variables from the parent terminal
+    load_dotenv(override=True)
+except ImportError:
+    pass
 
 from intentguard.storage.db import init_db, get_recent_actions
 from intentguard.interceptors.cli import run_protected_command

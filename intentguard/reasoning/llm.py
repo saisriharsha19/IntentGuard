@@ -1,7 +1,48 @@
 import json
 import os
+import re
 from litellm import completion
 from typing import Dict, Any
+
+def try_parse_json(text: str) -> Dict[str, Any]:
+    """
+    Attempts to parse JSON out of an LLM response robustly.
+    Handles raw JSON, markdown-wrapped JSON, and plain text.
+    """
+    text = text.strip()
+    # Try parsing the raw text directly
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+        
+    # Look for a json markdown block
+    json_blocks = re.findall(r'```json\n(.*?)\n```', text, re.DOTALL | re.IGNORECASE)
+    if json_blocks:
+        try:
+            return json.loads(json_blocks[0].strip())
+        except json.JSONDecodeError:
+            pass
+            
+    # Look for any markdown block
+    any_blocks = re.findall(r'```\n(.*?)\n```', text, re.DOTALL)
+    if any_blocks:
+        try:
+            return json.loads(any_blocks[0].strip())
+        except json.JSONDecodeError:
+            pass
+            
+    # Attempt to find the first `{` and last `}`
+    start_idx = text.find('{')
+    end_idx = text.rfind('}')
+    if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+        try:
+            return json.loads(text[start_idx:end_idx+1])
+        except json.JSONDecodeError:
+            pass
+
+    return {}
+
 
 def analyze_intent(command: str, user: str, context: str = "") -> Dict[str, Any]:
     """
@@ -28,17 +69,31 @@ Analyze the command and return a JSON object with the following fields:
 Only output valid JSON format.
 """
 
-    # Model fallbacks via litellm can be parameterized, but we'll use a local fallback or OpenAI default.
     model = os.environ.get("INTENTGUARD_MODEL", "gpt-3.5-turbo")
+    api_base = os.environ.get("INTENTGUARD_API_BASE", None)
+    api_key = os.environ.get("INTENTGUARD_API_KEY", None)
+
+    # Prepare litellm args
+    kwargs = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    
+    if api_base:
+        kwargs["api_base"] = api_base
+        
+    if api_key:
+        kwargs["api_key"] = api_key
+        
+    # Use json mode if we strictly know it's a provider that supports it
+    if "gpt" in model.lower() and not model.startswith("ollama/"):
+        kwargs["response_format"] = {"type": "json_object"}
 
     try:
-        response = completion(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"} if "gpt" in model else None
-        )
+        response = completion(**kwargs)
         content = response.choices[0].message.content
-        data = json.loads(content)
+        data = try_parse_json(content)
+        
         # Ensure mapping of fields exists
         return {
             "intent": data.get("intent", "Unknown"),
