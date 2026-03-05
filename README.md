@@ -22,10 +22,17 @@ Traditional safeguards rely on static rules, regex patterns, or strict permissio
 
 ## Installation
 
-Getting started with the IntentGuard agent is straightforward. Install the package via `pip` and initialize your local setup:
+Since IntentGuard is currently in alpha, you can install it locally directly from the source repository:
 
 ```bash
-pip install intentguard
+# Clone the repository (if not already downloaded)
+git clone https://github.com/yourusername/intentguard.git
+cd intentguard
+
+# Install the agent in editable mode
+pip install -e .
+
+# Initialize the configuration
 intentguard init
 ```
 
